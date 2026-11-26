@@ -8,7 +8,8 @@ export default defineConfig({
     vue(),
     dts({
       insertTypesEntry: true,
-      include: ['src/**/*.ts', 'src/**/*.vue']
+      include: ['src/**/*.ts', 'src/**/*.vue'],
+      exclude: ['src/stories/**', 'src/**/__tests__/**']
     })
   ],
   resolve: {
@@ -40,8 +41,8 @@ export default defineConfig({
         '@open-dcp/vue-basic-components',
         'date-fns',
         'date-fns-tz',
-        'lodash-es',
         'uuid',
+        'dompurify',
         '@mdi/font',
         /^vuetify(\/.*)?$/,
         /^@open-dcp\/.*/,

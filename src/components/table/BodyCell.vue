@@ -8,9 +8,11 @@
             <span v-bind="normalizedRenderedElement"></span>
         </template>
         <template v-else-if="column.displayAsHtml">
-            <span v-html="row[column.key].display"></span>
+            <!-- opt-in HTML: sanitized, never raw -->
+            <span v-html="sanitizedHtml"></span>
         </template>
         <template v-else>
+            <!-- cell data is escaped (text), see useDisplayCell -->
             <span v-html="displayCell"></span>
         </template>
     </td>
@@ -20,6 +22,7 @@
 import { PropType, computed } from 'vue';
 import { GridColumn, BodyCellSpecialValues } from '@/types/GridColumn';
 import { useDisplayCell } from '@/composables/useGridDisplayCell';
+import DOMPurify from 'dompurify';
 import { Row } from '@open-dcp/grid';
 
 const props = defineProps({
@@ -66,5 +69,11 @@ const normalizedRenderedElement = computed(() => {
     return renderedElement;
 });
 
-const displayCell = useDisplayCell(props.row[props.column.key], props.specialDisplayValues);
+// Getters keep the cell reactive when the row object is replaced (refreshed data with the same row key).
+const displayCell = useDisplayCell(() => props.row[props.column.key], () => props.specialDisplayValues);
+
+const sanitizedHtml = computed(() => {
+    const display = props.row[props.column.key]?.display;
+    return display === null || display === undefined ? '' : DOMPurify.sanitize(String(display));
+});
 </script>
